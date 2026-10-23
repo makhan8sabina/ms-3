@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Математикалық сауаттылық · 3-ай 3-апта</title>
+<style>
+:root{--ink:#073b44;--teal:#0aa3b5;--deep:#0a6f7d;--mint:#d9f4f7;--bg:#f2fbfc;--ok:#1f9d55;--bad:#d64545;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 "Trebuchet MS","Segoe UI",system-ui,sans-serif}
+header{background:var(--teal);color:#fff;padding:14px 20px;font-weight:700;letter-spacing:.2px}
+main{max-width:860px;margin:0 auto;padding:18px 16px 60px}
+h1{font-size:clamp(28px,6vw,44px);line-height:1.1;margin:.3em 0}
+h2{font-size:clamp(19px,3.6vw,24px);line-height:1.35;margin:.4em 0 .8em}
+.card{background:#fff;border:2px solid var(--mint);border-radius:18px;padding:22px}
+.bar{height:10px;background:var(--mint);border-radius:9px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--teal);transition:width .3s}
+.meta{margin:8px 0 0;color:var(--deep);font-weight:700}
+button{font:inherit;cursor:pointer}
+.main,.ghost{border:0;border-radius:12px;padding:12px 22px;font-weight:700}
+.main{background:var(--teal);color:#fff}.ghost{background:var(--mint);color:var(--deep)}
+button:disabled{opacity:.4;cursor:default}
+button:focus-visible,input:focus-visible{outline:3px solid #ffb703;outline-offset:2px}
+.opts{display:grid;gap:10px;grid-template-columns:1fr 1fr;margin:14px 0}
+.opt{display:flex;gap:10px;align-items:center;text-align:left;background:#fff;border:2px solid #bfe6ec;border-radius:12px;padding:12px;color:var(--ink)}
+.opt b{background:var(--mint);color:var(--deep);border-radius:8px;min-width:30px;height:30px;display:grid;place-items:center}
+.opt.sel{border-color:var(--teal);background:var(--mint)}
+.opt.ok{border-color:var(--ok);background:#e5f7ec}.opt.no{border-color:var(--bad);background:#fdeaea;opacity:.8}
+.nav{display:flex;justify-content:space-between;gap:10px}
+.fig{background:linear-gradient(#eefbfd,#fff);border:2px dashed #bfe6ec;border-radius:14px;margin:10px 0;padding:8px;text-align:center}
+.fig svg{width:100%;max-width:360px;height:auto}
+.fig .p{fill:#cdeef3;stroke:#0a8ea0;stroke-width:2}.fig .l{stroke:#0a6f7d;stroke-width:1.6;fill:none}
+.fig text{font:13px sans-serif;fill:#073b44}.fig .d{stroke-dasharray:4}
+.scene{perspective:900px;height:270px;position:relative;cursor:grab;touch-action:none;user-select:none;overflow:hidden}
+.obj,.part{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}
+.face{position:absolute;left:0;top:0;background:rgba(34,184,207,.45);border:2px solid #0a6f7d}
+.hint{font-size:14px;color:var(--deep);margin:2px 0 6px}
+.views{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.views button{padding:6px 12px;font-size:14px}
+.score{font-size:64px;font-weight:800;color:var(--deep);line-height:1}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.chip{min-width:38px;text-align:center;border-radius:10px;padding:4px 8px;font-weight:700}
+.chip.g{background:#e5f7ec;color:var(--ok)}.chip.r{background:#fdeaea;color:var(--bad)}
+.msg{padding:10px 14px;border-radius:12px;margin:8px 0;font-weight:700}
+.msg.no{background:#fdeaea;color:var(--bad)}.msg.ok{background:#e5f7ec;color:var(--ok)}
+.sol{background:#fff8e1;border-left:5px solid #ffb703;border-radius:8px;padding:10px 14px;margin:8px 0}
+input{font:inherit;padding:12px;border:2px solid #bfe6ec;border-radius:12px;width:100%;max-width:340px;margin:10px 0}
+.center{text-align:center}
+.cf{position:fixed;top:-40px;font-size:28px;animation:fall linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+@media(max-width:560px){.opts{grid-template-columns:1fr}.card{padding:14px}}
+@media(prefers-reduced-motion:reduce){.cf{display:none}}
+</style>
+</head>
+<body>
+<header>Математикалық сауаттылық · 3-ай 3-апта</header>
+<main><div id="app" class="card"></div></main>
+<script>
+const S=c=>`<svg viewBox="0 0 220 150">${c}</svg>`;
+const bx=(w,h,d)=>[{x:0,y:0,z:0,w,h,d}];
+const grid=(on)=>{let r='';for(let y=0;y<4;y++)for(let x=0;x<4;x++)r+=`<rect x="${40+x*35}" y="${5+y*35}" width="35" height="35" fill="${on.includes(y*4+x)?'#0aa3b5':'#fff'}" stroke="#0a6f7d" stroke-width="2"/>`;return S(r)};
+const Q=[
+{q:"Трапецияның табандары 8 см және 14 см, биіктігі 6 см. Трапецияның ауданын табыңыз.",o:["132 см²","28 см²","84 см²","66 см²"],a:3,s:"S = (8 + 14) : 2 · 6 = 66 см²",
+ svg:S('<polygon class="p" points="55,30 145,30 195,120 15,120"/><line class="l d" x1="55" y1="30" x2="55" y2="120"/><text x="90" y="22">8 см</text><text x="92" y="140">14 см</text><text x="62" y="80">6 см</text>')},
+{q:"Параллелограммның ауданы 72 см², ал табаны 9 см. Осы табанға түсірілген биіктікті табыңыз.",o:["8 см","4 см","63 см","16 см"],a:0,s:"h = S : a = 72 : 9 = 8 см",
+ svg:S('<polygon class="p" points="55,30 200,30 165,120 20,120"/><line class="l d" x1="110" y1="30" x2="110" y2="120"/><text x="118" y="80">h</text><text x="80" y="140">9 см</text><text x="130" y="58">S = 72 см²</text>')},
+{q:"Радиусы 5 см дөңгелектің ауданын табыңыз (π = 3).",o:["30 см²","75 см²","15 см²","225 см²"],a:1,s:"S = πR² = 3 · 5² = 75 см²"},
+{q:"Кубтың қырлары саны мен төбелері санының қосындысын табыңыз.",o:["18","20","14","26"],a:1,s:"Кубтың 12 қыры және 8 төбесі бар: 12 + 8 = 20",b:bx(1,1,1),cap:"Қырлары мен төбелерін санап көр!"},
+{q:"Қыры 5 см кубтың толық бетінің ауданын табыңыз.",o:["125 см²","25 см²","150 см²","100 см²"],a:2,s:"S = 6a² = 6 · 25 = 150 см²",b:bx(1,1,1),cap:"Қыры 5 см"},
+{q:"Аквариумның өлшемдері 50 см × 30 см × 40 см. Аквариумның сыйымдылығын литрмен табыңыз.",o:["60 л","600 л","6 л","6000 л"],a:0,s:"V = 50 · 30 · 40 = 60 000 см³. 1 л = 1000 см³, сондықтан 60 л",b:bx(50,40,30),cap:"50 × 30 × 40 см"},
+{q:"Шаршы 4 × 4 торға (16 бірдей шаршы көзге) бөлінген, оның 6 көзі боялған. Шаршының неше пайызы боялған?",o:["6%","60%","40%","37,5%"],a:3,s:"6 : 16 = 0,375 = 37,5%",svg:grid([0,2,7,9,12,14])},
+{q:"Қабырғасы 10 см шаршыға дөңгелек іштей сызылған. Шаршының дөңгелектен тыс бөлігінің ауданын табыңыз (π = 3).",o:["70 см²","25 см²","40 см²","75 см²"],a:1,s:"Шаршы: 100 см². Дөңгелек (R = 5): 3 · 25 = 75 см². Айырма: 100 − 75 = 25 см²",
+ svg:S('<rect class="p" x="45" y="10" width="130" height="130"/><circle cx="110" cy="75" r="65" fill="#fff" stroke="#0a6f7d" stroke-width="2"/><text x="95" y="152">10 см</text>')},
+{q:"Тікбұрышты параллелепипедтің өлшемдері 6 см, 4 см және 3 см. Оның толық бетінің ауданын табыңыз.",o:["54 см²","72 см²","108 см²","96 см²"],a:2,s:"S = 2(ab + bc + ac) = 2(24 + 12 + 18) = 108 см²",b:bx(6,3,4),cap:"6 × 4 × 3 см"},
+{q:"Кубтың толық бетінің ауданы 54 см². Кубтың көлемін табыңыз.",o:["27 см³","9 см³","54 см³","81 см³"],a:0,s:"6a² = 54, a² = 9, a = 3 см. V = a³ = 27 см³",b:bx(1,1,1),cap:"Куб"},
+{q:"Тең бүйірлі трапецияның табандары 7 см және 19 см, ал периметрі 46 см. Трапецияның ауданын табыңыз.",o:["130 см²","104 см²","208 см²","96 см²"],a:1,s:"Бүйір қабырға: (46 − 7 − 19) : 2 = 10 см. Табандардың айырмасының жартысы: (19 − 7) : 2 = 6 см. Биіктік: √(10² − 6²) = 8 см. S = (7 + 19) : 2 · 8 = 104 см²",
+ svg:S('<polygon class="p" points="70,30 150,30 195,120 25,120"/><text x="100" y="22">7 см</text><text x="98" y="140">19 см</text><text x="86" y="82">P = 46 см</text><text x="38" y="72">10</text><text x="170" y="72">10</text>')},
+{q:"ABCD параллелограммының ауданы 60 см². Параллелограммның ішінен кез келген O нүктесі алынып, ол төбелермен қосылды. AOB және COD үшбұрыштарының аудандарының қосындысын табыңыз.",o:["15 см²","60 см²","20 см²","30 см²"],a:3,s:"Екі үшбұрыштың биіктіктерінің қосындысы параллелограмның биіктігіне тең. Сондықтан S(AOB) + S(COD) = ½ · 60 = 30 см²",
+ svg:S('<polygon class="p" points="20,125 150,125 200,25 70,25"/><polyline class="l" points="20,125 110,75 200,25"/><polyline class="l" points="150,125 110,75 70,25"/><text x="108" y="70">O</text><text x="6" y="138">A</text><text x="152" y="140">B</text><text x="203" y="30">C</text><text x="58" y="20">D</text>')},
+{q:"Суреттегі фигураның барлық бұрыштары тік. Өлшемдері суретте көрсетілген. Фигураның ауданын табыңыз.",o:["36 см²","80 см²","68 см²","56 см²"],a:2,s:"Фигураны екіге бөлеміз: төменгі тікбұрыш 10 · 5 = 50 см², жоғарғы бөлігі (10 − 4) · (8 − 5) = 6 · 3 = 18 см². S = 50 + 18 = 68 см²",
+ svg:S('<polygon class="p" points="40,140 40,52 106,52 106,85 150,85 150,140"/><text x="8" y="100">8 см</text><text x="152" y="115">5 см</text><text x="100" y="156">10 см</text><text x="116" y="78">4 см</text>')},
+{q:"Радиустары 6 см және 4 см болатын ортақ центрлі екі шеңбердің арасындағы сақинаның ауданын табыңыз (π = 3).",o:["12 см²","60 см²","6 см²","156 см²"],a:1,s:"S = π(R² − r²) = 3 · (36 − 16) = 60 см²",
+ svg:S('<circle cx="110" cy="75" r="65" class="p"/><circle cx="110" cy="75" r="42" fill="#fff" stroke="#0a6f7d" stroke-width="2"/><line class="l" x1="110" y1="75" x2="156" y2="29"/><line class="l" x1="110" y1="75" x2="80" y2="105"/><text x="140" y="38">6 см</text><text x="80" y="98">4 см</text>')},
+{q:"Нысана ортақ центрлі бес шеңберден тұрады, олардың радиустары 2, 4, 6, 8 және 10 см. Оқ нысанаға тиді (нысананың кез келген нүктесіне тию мүмкіндігі бірдей). Оның ортадағы радиусы 2 см дөңгелекке тию ықтималдығын табыңыз.",o:["20%","16%","4%","2%"],a:2,s:"Ықтималдық = ішкі дөңгелектің ауданы : нысананың ауданы = π·2² : π·10² = 4 : 100 = 4%",
+ svg:S('<g class="l"><circle cx="110" cy="75" r="70" fill="#f2fbfc"/><circle cx="110" cy="75" r="56" fill="#fff"/><circle cx="110" cy="75" r="42" fill="#f2fbfc"/><circle cx="110" cy="75" r="28" fill="#fff"/><circle cx="110" cy="75" r="14" fill="#0aa3b5"/></g><text x="2" y="145">радиустар: 2, 4, 6, 8, 10 см</text>')},
+{q:"Шаршының қабырғаларының орталарын қосып, ішінен екінші шаршы салынды. Екінші шаршының қабырғаларының орталарын қосып, үшінші шаршы салынды. Тек үшінші шаршы боялған. Үлкен шаршының неше пайызы боялған?",o:["25%","50%","12,5%","33⅓%"],a:0,s:"Әр келесі шаршының ауданы алдыңғысының жартысы: ½ · ½ = ¼ = 25%",
+ svg:S('<rect class="l" x="40" y="5" width="140" height="140"/><polygon class="l" points="110,5 180,75 110,145 40,75"/><rect x="75" y="40" width="70" height="70" fill="#0aa3b5" stroke="#0a6f7d" stroke-width="2"/>')},
+{q:"Координаталық торда (тор көзінің қабырғасы 1 см) төбелері A(1; 1), B(7; 1), C(4; 5) нүктелерінде жатқан үшбұрыштың ауданын табыңыз.",o:["24 см²","15 см²","10 см²","12 см²"],a:3,s:"AB = 7 − 1 = 6 см (табан), биіктік = 5 − 1 = 4 см. S = ½ · 6 · 4 = 12 см²",
+ svg:S('<path d="M20 140V10M20 130H210" class="l"/><polygon class="p" points="40,110 160,110 100,30"/><text x="26" y="124">A</text><text x="164" y="124">B</text><text x="96" y="24">C</text><text x="4" y="114">1</text><text x="38" y="146">1</text>')},
+{q:"Өлшемдері 8 см × 6 см × 5 см тікбұрышты параллелепипедтен қыры 3 см куб кесіп алынды. Қалған бөліктің көлемін табыңыз.",o:["231 см³","222 см³","213 см³","240 см³"],a:2,s:"V = 8 · 6 · 5 − 3³ = 240 − 27 = 213 см³",
+ b:[{x:0,y:0,z:0,w:8,h:2,d:6},{x:0,y:2,z:0,w:5,h:3,d:6},{x:5,y:2,z:3,w:3,h:3,d:3}],cap:"8 × 6 × 5 см, бұрышынан қыры 3 см куб кесілген"},
+{q:"Кубтың жазбасының (6 бірдей шаршыдан тұрады) ауданы 150 см². Кубтың көлемін табыңыз.",o:["25 см³","150 см³","125 см³","1000 см³"],a:2,s:"Бір шаршы: 150 : 6 = 25 см², яғни a = 5 см. V = 5³ = 125 см³",b:bx(1,1,1),cap:"Куб"},
+{q:"Қыры 2 см төрт бірдей кубты бірінің үстіне бірін дәл (беттері толық беттесетіндей) қойып, мұнара жасады. Шыққан дененің толық бетінің ауданын табыңыз.",o:["96 см²","80 см²","64 см²","72 см²"],a:3,s:"Мұнара — 2 × 2 × 8 см параллелепипед. S = 2(2·2 + 2·8 + 2·8) = 2 · 36 = 72 см²",
+ b:[0,1,2,3].map(i=>({x:0,y:i,z:0,w:1,h:1,d:1})),grid:1,cap:"Қыры 2 см төрт куб"},
+{q:"Үсті ашық (қақпағы жоқ) жәшіктің өлшемдері 60 см × 40 см × 30 см (60 × 40 — табаны). Жәшіктің сыртын (табанын қоса, бүйір беттері мен табанын) бояу керек. Боялатын беттің ауданын м²-пен табыңыз.",o:["1,08 м²","0,84 м²","8,4 м²","0,6 м²"],a:1,s:"Табан: 60 · 40 = 2400. Бүйір: 2 · 60 · 30 + 2 · 40 · 30 = 3600 + 2400 = 6000. Барлығы 8400 см² = 0,84 м²",b:bx(60,30,40),open:1,cap:"Үсті ашық жәшік"},
+{q:"Аквариумның ұзындығы 80 см, ені ұзындығының 50%-ына тең, ал биіктігі енінен 25%-ға артық. Аквариумның металл қаңқасына (барлық қырлары) неше метр профиль кетеді?",o:["1,7 м","68 м","6,8 м","3,4 м"],a:2,s:"Ені: 80 · 0,5 = 40 см. Биіктігі: 40 · 1,25 = 50 см. Қырлардың қосындысы: 4(80 + 40 + 50) = 680 см = 6,8 м",b:bx(80,50,40),cap:"Ұзындығы 80 см"},
+{q:"Өлшемдері 6 см × 4 см × 9 см тікбұрышты параллелепипедтің көлемінің қыры 6 см кубтың көлеміне қатынасын табыңыз.",o:["1 : 1","2 : 3","3 : 2","4 : 9"],a:0,s:"6 · 4 · 9 = 216 см³ және 6³ = 216 см³. Қатынасы 1 : 1",b:bx(6,9,4),cap:"6 × 4 × 9 см"},
+{q:"Табанының өлшемдері 50 см × 40 см аквариумда су бар. Аквариумға көлемі 6 л тас салғанда, су деңгейі неше сантиметрге көтеріледі? (Тас суға толық батады, су төгілмейді.)",o:["0,3 см","3 см","30 см","1,5 см"],a:1,s:"6 л = 6000 см³. Табанының ауданы 50 · 40 = 2000 см². Көтерілуі: 6000 : 2000 = 3 см"},
+{q:"Шеңбердің ұзындығы 42 см. Осы шеңбермен шектелген дөңгелектің ауданын табыңыз (π = 3).",o:["147 см²","588 см²","441 см²","126 см²"],a:0,s:"C = 2πr = 6r = 42, r = 7 см. S = πr² = 3 · 49 = 147 см²"},
+{q:"Қабырғасы 12 см шаршының әр төбесінен центрі сол төбеде жатқан, радиусы 6 см ширек дөңгелек қиып алынды. Шаршының қалған бөлігінің ауданын табыңыз (π = 3).",o:["108 см²","117 см²","72 см²","36 см²"],a:3,s:"Шаршы: 144 см². 4 ширек = 1 толық дөңгелек: 3 · 36 = 108 см². Қалғаны: 144 − 108 = 36 см²",
+ svg:S('<defs><clipPath id="c"><rect x="45" y="10" width="130" height="130"/></clipPath></defs><rect class="p" x="45" y="10" width="130" height="130"/><g clip-path="url(#c)" fill="#fff" stroke="#0a6f7d" stroke-width="2"><circle cx="45" cy="10" r="65"/><circle cx="175" cy="10" r="65"/><circle cx="45" cy="140" r="65"/><circle cx="175" cy="140" r="65"/></g><text x="100" y="152">12 см</text>')},
+{q:"Бөлменің ұзындығы 5 м, ені 4 м, биіктігі 3 м. Төрт қабырға мен төбені бояу керек; терезе мен есіктің жалпы ауданы 6 м². 1 м²-ге 0,2 кг бояу жұмсалады, бояу 2,5 кг-дық банкамен сатылады. Ең кемінде неше банка бояу сатып алу керек?",o:["5","7","6","14"],a:2,s:"Қабырғалар: 2(5 + 4) · 3 = 54 м². Төбе: 5 · 4 = 20 м². Барлығы 74 − 6 = 68 м². Бояу: 68 · 0,2 = 13,6 кг. 13,6 : 2,5 = 5,44, яғни ең кемінде 6 банка",b:bx(5,3,4),cap:"Бөлме 5 × 4 × 3 м"},
+{q:"Қыры 4 см кубтың барлық беті боялды. Сосын оны қыры 1 см кубтарға бөлді. Дәл екі беті боялған неше кіші куб шығады?",o:["24","8","32","16"],a:0,s:"Тек қырларының ортасындағы кубтар: әр қырда 4 − 2 = 2 куб, ал қыр саны 12. 12 · 2 = 24",
+ b:bx(4,4,4),grid:1,cap:"4 × 4 × 4 = 64 кіші куб"},
+{q:"Кубтың әр қырын 10%-ға ұзартты. Кубтың көлемі неше пайызға артады?",o:["30%","33,1%","21%","10%"],a:1,s:"V₂ = (1,1a)³ = 1,331a³. Көлем 33,1%-ға артады"},
+{q:"Тікбұрышты параллелепипедтің ұзындығы мен енінің қосындысы 12 см, ені мен биіктігінің қосындысы 14 см, ал ұзындығы мен биіктігінің қосындысы 10 см. Параллелепипедтің көлемін табыңыз.",o:["168 см³","96 см³","240 см³","192 см³"],a:3,s:"Үшеуін қосамыз: 2(a + b + c) = 36, a + b + c = 18. Ұзындығы 18 − 14 = 4, ені 18 − 10 = 8, биіктігі 18 − 12 = 6. V = 4 · 8 · 6 = 192 см³"}
+];
+const N=Q.length,app=document.getElementById('app');
+let st;
+const fresh=()=>({i:0,ans:Array(N).fill(null),name:'',wrong:[],fi:0,fixed:0,first:0});
+
+function make3d(f){
+ let W=0,H=0,D=0;f.b.forEach(p=>{W=Math.max(W,p.x+p.w);H=Math.max(H,p.y+p.h);D=Math.max(D,p.z+p.d)});
+ const s=150/Math.max(W,H,D);
+ const wrap=document.createElement('div');
+ wrap.innerHTML='<p class="hint">Фигураны тышқанмен не саусағыңмен айналдыр</p><div class="scene"><div class="obj"></div></div><p class="hint">'+(f.cap||'')+'</p><div class="views"><button class="ghost" data-v="-12,0">Алдынан</button><button class="ghost" data-v="-80,0">Үстінен</button><button class="ghost" data-v="-10,90">Бүйірінен</button><button class="ghost" data-v="-25,-35">Айналдыру</button></div>';
+ const scene=wrap.querySelector('.scene'),obj=wrap.querySelector('.obj');
+ f.b.forEach(p=>{
+  const w=p.w*s,h=p.h*s,d=p.d*s,c=document.createElement('div');c.className='part';
+  c.style.transform=`translate3d(${(p.x+p.w/2-W/2)*s}px,${-(p.y+p.h/2-H/2)*s}px,${(p.z+p.d/2-D/2)*s}px)`;
+  [['f',w,h,`translateZ(${d/2}px)`],['k',w,h,`rotateY(180deg) translateZ(${d/2}px)`],['r',d,h,`rotateY(90deg) translateZ(${w/2}px)`],['l',d,h,`rotateY(-90deg) translateZ(${w/2}px)`],['t',w,d,`rotateX(90deg) translateZ(${h/2}px)`],['b',w,d,`rotateX(-90deg) translateZ(${h/2}px)`]].forEach(([n,fw,fh,tr])=>{
+   if(n==='t'&&f.open)return;
+   const e=document.createElement('div');e.className='face';
+   e.style.cssText=`width:${fw}px;height:${fh}px;margin:${-fh/2}px 0 0 ${-fw/2}px;transform:${tr}`;
+   if(f.grid){e.style.backgroundImage='linear-gradient(#0a6f7d 1px,transparent 1px),linear-gradient(90deg,#0a6f7d 1px,transparent 1px)';e.style.backgroundSize=s+'px '+s+'px'}
+   c.appendChild(e)});
+  obj.appendChild(c)});
+ let rx=-25,ry=-35,drag=false,lx=0,ly=0,auto=true;
+ const set=()=>obj.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`;set();
+ scene.onpointerdown=e=>{drag=true;auto=false;lx=e.clientX;ly=e.clientY;scene.setPointerCapture(e.pointerId)};
+ scene.onpointermove=e=>{if(!drag)return;ry+=(e.clientX-lx)*.6;rx=Math.max(-90,Math.min(90,rx-(e.clientY-ly)*.6));lx=e.clientX;ly=e.clientY;set()};
+ scene.onpointerup=()=>drag=false;
+ wrap.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{const [a,c]=b.dataset.v.split(',').map(Number);rx=a;ry=c;auto=b.textContent==='Айналдыру';set()});
+ (function loop(){if(!scene.isConnected&&wrap.isConnected===false&&!document.body.contains(scene)&&loop.ready)return;loop.ready=true;if(auto&&!drag){ry+=.35;set()}if(document.body.contains(scene))requestAnimationFrame(loop);else if(!loop.t){loop.t=1;requestAnimationFrame(loop)}})();
+ return wrap;
+}
+function figEl(q){const d=document.createElement('div');d.className='fig';if(q.svg)d.innerHTML=q.svg;else if(q.b)d.appendChild(make3d(q));else return null;return d}
+function putFig(q){const f=figEl(q),h=document.getElementById('fb');if(f)h.appendChild(f)}
+
+function start(){st=fresh();
+ app.innerHTML=`<div class="center"><h1>Геометрия сынағы 📐</h1><p>30 сұрақ · фигураларды айналдырып көр · соңында қатемен жұмыс жасайсың</p><input id="nm" placeholder="Атың кім?" autocomplete="name"><br><button class="main" id="go">Тестті бастау</button></div>`;
+ document.getElementById('go').onclick=()=>{st.name=document.getElementById('nm').value.trim();test()}}
+
+function test(){
+ const q=Q[st.i];
+ app.innerHTML=`<div class="bar"><i style="width:${st.i/N*100}%"></i></div><p class="meta">Сұрақ ${st.i+1} / ${N}</p><h2>${q.q}</h2><div id="fb"></div><div class="opts">${q.o.map((t,k)=>`<button class="opt ${st.ans[st.i]===k?'sel':''}" data-k="${k}"><b>${'ABCD'[k]}</b>${t}</button>`).join('')}</div><div class="nav"><button class="ghost" id="pv" ${st.i?'':'disabled'}>← Алдыңғы</button><button class="main" id="nx">${st.i<N-1?'Келесі →':'Аяқтау ✔'}</button></div>`;
+ putFig(q);
+ app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{st.ans[st.i]=+b.dataset.k;app.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel',x===b))});
+ document.getElementById('pv').onclick=()=>{st.i--;test()};
+ document.getElementById('nx').onclick=()=>{
+  if(st.i<N-1){st.i++;test();return}
+  const e=st.ans.filter(a=>a===null).length,nx=document.getElementById('nx');
+  if(e&&!nx.dataset.w){nx.dataset.w=1;nx.textContent='Жауапсыз: '+e+'. Бәрібір аяқтау ✔';
+   const first=st.ans.findIndex(a=>a===null);
+   nx.insertAdjacentHTML('beforebegin','');
+   document.querySelector('.meta').insertAdjacentHTML('afterend','<div class="msg no">'+e+' сұраққа жауап берген жоқсың (№'+(first+1)+'-ден бастап). Жауап беру үшін «Алдыңғы» батырмасын бас, не қайта «Аяқтау» бас.</div>');return}
+  result()}}
+
+function result(){
+ st.wrong=Q.map((q,i)=>i).filter(i=>st.ans[i]!==Q[i].a);
+ st.first=N-st.wrong.length;st.fi=0;
+ const p=Math.round(st.first/N*100);
+ const m=p===100?'Тамаша! Қате жоқ! 🏆':p>=80?'Өте жақсы! 💪':p>=50?'Жақсы, бірақ қателермен жұмыс істейік':'Қорықпа, қатемен жұмыс көмектеседі';
+ app.innerHTML=`<div class="center"><h1>Нәтиже${st.name?', '+st.name:''}</h1><div class="score">${st.first}/${N}</div><p>${p}% · ${m}</p></div><div class="chips">${Q.map((q,i)=>`<span class="chip ${st.wrong.includes(i)?'r':'g'}">${i+1}</span>`).join('')}</div><p>${st.wrong.length?'Қате жіберген сұрақтар қызыл түспен көрсетілген.':'Барлық жауап дұрыс!'}</p><div class="center"><button class="main" id="nx">${st.wrong.length?'Қатемен жұмысты бастау':'Жалғастыру'}</button></div>`;
+ document.getElementById('nx').onclick=()=>st.wrong.length?fix():done()}
+
+function fix(){
+ const qi=st.wrong[st.fi],q=Q[qi];let tried=[],solved=false;
+ app.innerHTML=`<div class="bar"><i style="width:${st.fi/st.wrong.length*100}%"></i></div><p class="meta">Қатемен жұмыс · ${st.fi+1} / ${st.wrong.length} (тест №${qi+1})</p><h2>${q.q}</h2><div id="fb"></div><div class="opts">${q.o.map((t,k)=>`<button class="opt" data-k="${k}"><b>${'ABCD'[k]}</b>${t}</button>`).join('')}</div><div id="fx"></div><div class="nav"><button class="ghost" id="hs">Шешуін көрсету</button><button class="main" id="nx" disabled>${st.fi<st.wrong.length-1?'Келесі қате →':'Аяқтау ✔'}</button></div>`;
+ putFig(q);
+ const fx=document.getElementById('fx'),sol=()=>{if(!document.getElementById('sl'))fx.insertAdjacentHTML('beforeend',`<div class="sol" id="sl"><b>Шешуі:</b> ${q.s}</div>`)};
+ app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+  if(solved||b.classList.contains('no'))return;
+  const k=+b.dataset.k;
+  if(k===q.a){solved=true;b.classList.add('ok');st.fixed++;fx.innerHTML='<div class="msg ok">Дұрыс! ✔</div>';sol();document.getElementById('nx').disabled=false}
+  else{b.classList.add('no');tried.push(k);fx.innerHTML='<div class="msg no">Қате. Қайтадан ойланып көр!</div>'}});
+ document.getElementById('hs').onclick=sol;
+ document.getElementById('nx').onclick=()=>{if(st.fi<st.wrong.length-1){st.fi++;fix()}else done()}}
+
+function done(){
+ app.innerHTML=`<div class="center"><h1>ЖАРАЙСЫҢ! 🎉</h1><p>${st.name?st.name+', с':'С'}ен тестті аяқтап, барлық қатемен жұмысты орындадың.</p><div class="score">${st.first}/${N}</div><p>Тесттегі нәтиже${st.wrong.length?` · түзетілген қате: ${st.wrong.length}`:''}</p><button class="main" id="again">Қайта өту</button></div>`;
+ document.getElementById('again').onclick=start;
+ for(let i=0;i<40;i++){const s=document.createElement('span');s.className='cf';s.textContent=['🎉','⭐','🎊','✨','📐'][i%5];s.style.left=Math.random()*100+'vw';s.style.animationDuration=(2+Math.random()*2.5)+'s';s.style.animationDelay=Math.random()*1.2+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),6000)}}
+start();
+</script>
+</body>
+</html>
